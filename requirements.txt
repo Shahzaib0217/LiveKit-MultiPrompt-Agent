@@ -1,0 +1,9 @@
+# Core LiveKit Agents with essential plugins
+livekit-agents[openai,deepgram,cartesia,silero,turn-detector,google]~=1.0
+
+# Plugin overrides to ensure plugins align with agents version
+livekit-plugins-openai~=1.0
+livekit-plugins-deepgram~=1.0  # or ==1.0.0rc4 if you need that RC exactly
+livekit-plugins-mistralai
+# Optional extras:
+python-dotenv==1.1.1
