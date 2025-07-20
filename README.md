@@ -1,10 +1,17 @@
 # LiveKit Multi Prompt Voice Agent
 
+## Features
+- Multi-customer support: Each customer can have unique agent flows, prompts, and routing.
+- Dynamic agent creation: Agents and their transitions are defined in config files, not hardcoded.
+- Voice interaction: Integrates with LiveKit, OpenAI, Deepgram, and Silero for LLM, STT, TTS, and VAD.
+- Extensible: Add new customers, agents, or prompts by editing config files.
+- Schema validation: Ensures configs are valid using JSON Schema.
+
 ## Project structure
 ```
 ├── README.md
 ├── requirements.txt
-├── config/
+├── config/ (Contains JSON files)
 │   ├── config_schema.json       # JSON Schema definition
 │   └── agents_config.json       # Sample configuration
 ├── config_schema.py             # Loader & validator
@@ -15,3 +22,24 @@
 ├── config.py                    # Code configurations 
 ├── main.py                      # Entrypoint, wiring
 ```
+
+## How to Run
+
+1. **Install Dependencies**
+   ```bash
+   python -m venv venv && source venv/bin/activate
+   pip install -r requirements.tx
+
+2. **Run Console App**
+    ```bash
+    python main.py console
+
+3. **Select a Customer**
+    You will be prompted to pick one from the list in agents_config.json.
+
+
+## 🔧 Extending this project
+You can extend this system by:
+
+- Adding more customers in agents_config.json.
+- Adding new function tool definitions and modifying dynamic_agent.py to support dynamic tool addition.
