@@ -42,10 +42,33 @@ class BuyingAgent(BaseAgent):
             choices = ["iPhone 15", "iPhone 15 Plus", "iPhone 14 pro"]
 
         msg = (
-            f"Based on your interest in {features}, I recommend: {', '.join(choices)}. "
+            f"Based on your preferences, I recommend: {', '.join(choices)}. "
             "Which one appeals to you?"
         )
         return msg
+
+
+    @function_tool()
+    async def get_price(self, model: str, context: RunContext_T) -> tuple[Agent, str]:
+        """
+        Return a price estimate for a given iPhone model (static values).
+        """
+        prices = {
+            "iphone 15": "$799",
+            "iphone 15 plus": "$899",
+            "iphone 15 pro": "$999",
+            "iphone 15 pro max": "$1,199",
+            "iphone 14": "$729",
+            "iphone 14 plus": "$849",
+            "iphone se": "$429",
+            "iphone 13 mini": "$599",
+        }
+        key = model.strip().lower()
+        price = prices.get(key)
+        if price:
+            return f"The current estimated price for {model.title()} is {price}."
+        else:
+            return f"I’m sorry, I don’t have pricing info for {model.title()}. You can try another model."
 
 
     @function_tool()
