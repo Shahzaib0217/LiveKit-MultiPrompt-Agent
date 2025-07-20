@@ -7,3 +7,4 @@ livekit-plugins-deepgram~=1.0  # or ==1.0.0rc4 if you need that RC exactly
 livekit-plugins-mistralai
 # Optional extras:
 python-dotenv==1.1.1
+jsonschema

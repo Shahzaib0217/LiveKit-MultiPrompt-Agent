@@ -1,0 +1,117 @@
+{
+  "customers": [
+    {
+      "customer_id": "Iphone sales corp.",
+      "agents": [
+        {
+          "id": "greeting",
+          "instructions": "Hello! What's your name?",
+          "prompts": [
+            { "name": "collect_name", "template": "Hello! I am your Iphone customer support assistant. Do you need support or want to buy an Iphone?", "on_call": {} }
+          ]
+        },
+        {
+          "id": "support",
+          "instructions": "I’m here to help with troubleshooting and questions.",
+          "prompts": [
+            {
+              "promptId": "log_issue",
+              "content": "I’ve noted your issue: {{issue}}. Would you like me to walk through some troubleshooting steps?",
+              "conditions": { "onIntent": "report_issue" },
+              "functions": ["log_support_issue"]
+            },
+            {
+              "promptId": "resolve",
+              "content": "Glad I could help! Anything else I can do for you?",
+              "conditions": { "onIntent": "issue_resolved" },
+              "functions": ["complete_support"]
+            }
+          ]
+        },
+        {
+          "id": "sales",
+          "instructions": "I can guide you through product selection and purchase.",
+          "prompts": [
+            {
+              "promptId": "ask_features",
+              "content": "What features are most important to you (e.g. camera, battery)?",
+              "conditions": { "onIntent": "start_buying" },
+              "functions": ["recommend_models"]
+            },
+            {
+              "promptId": "select_model",
+              "content": "You picked {{selected_model}}. Would you like pricing or confirm your order?",
+              "conditions": { "onIntent": "model_chosen" },
+              "functions": ["get_price", "confirm_order_details"]
+            },
+            {
+              "promptId": "confirm_order",
+              "content": "Shall I place the order for your {{selected_model}}?",
+              "conditions": { "onIntent": "confirmation_yes" },
+              "functions": ["place_order", "end_purchase_call"]
+            }
+          ]
+        }
+      ],
+      "routing": {
+        "greeting": { "transitions": { "to_support": "support", "to_sales": "sales" } },
+        "support":  { "transitions": { "to_sales": "sales", "end_support": "greeting" } },
+        "sales":    { "transitions": { "to_support": "support", "end_sales": "greeting" } }
+      }
+    },
+    {
+      "customer_id": "acme_corp",
+      "agents": [
+        {
+          "id": "greeting",
+          "instructions": "Welcome to Acme Corp! May I have your name?",
+          "prompts": [
+            { "name": "welcome", "template": "Hello! How can assist you today?", "on_call": {} }
+          ]
+        },
+        {
+          "id": "support",
+          "instructions": "Acme technical support at your service.",
+          "prompts": []
+        },
+        {
+          "id": "sales",
+          "instructions": "Let me help you pick the right Acme product.",
+          "prompts": []
+        }
+      ],
+      "routing": {
+        "greeting": { "transitions": { "to_support": "support", "to_sales": "sales" } },
+        "support":  { "transitions": { "to_sales": "sales", "end_support": "greeting" } },
+        "sales":    { "transitions": { "to_support": "support", "end_sales": "greeting" } }
+      }
+    },
+    {
+      "customer_id": "beta_inc",
+      "agents": [
+        {
+          "id": "greeting",
+          "instructions": "Hi there! You're speaking with Beta Inc's virtual assistant. What's your name?",
+          "prompts": [
+            { "name": "intro", "template": "Great to meet you! What can Beta Inc do for you today?", "on_call": {} }
+          ]
+        },
+        {
+          "id": "support",
+          "instructions": "Beta Inc support agent here—how can I resolve your issue?",
+          "prompts": []
+        },
+        {
+          "id": "sales",
+          "instructions": "Beta Inc sales representative at your disposal.",
+          "prompts": []
+        }
+      ],
+      "routing": {
+        "greeting": { "transitions": { "to_support": "support", "to_sales": "sales" } },
+        "support":  { "transitions": { "end_support": "greeting" } },
+        "sales":    { "transitions": { "end_sales": "greeting" } }
+      }
+    }
+  ]
+}

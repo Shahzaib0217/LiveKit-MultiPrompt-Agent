@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MultiPromptAgentConfig",
+  "description": "Configuration for a dynamic multi‑prompt agent supporting multiple customers and injected logic.",
+  "type": "object",
+  "properties": {
+    "customers": {
+      "type": "array",
+      "description": "Array of customer configurations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "customer_id": { "type": "string" },
+          "agents": {
+            "type": "array",
+            "description": "List of agents for this customer",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "instructions": { "type": "string" },
+                "prompts": {
+                  "type": "array",
+                  "description": "List of prompt definitions",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "template": { "type": "string" },
+                          "on_call": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "required": ["name", "template"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "promptId": { "type": "string" },
+                          "content": { "type": "string" },
+                          "conditions": {
+                            "type": "object",
+                            "description": "Triggering conditions, e.g. intents",
+                            "additionalProperties": true
+                          },
+                          "functions": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "Function-tool names to call when this prompt fires"
+                          }
+                        },
+                        "required": ["promptId", "content"]
+                      }
+                    ]
+                  }
+                }
+              },
+              "required": ["id", "instructions"]
+            }
+          },
+          "routing": {
+            "type": "object",
+            "description": "Agent transition map",
+            "patternProperties": {
+              "^.+$": {
+                "type": "object",
+                "properties": {
+                  "transitions": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^.+$": { "type": "string" }
+                    },
+                    "minProperties": 1
+                  }
+                },
+                "required": ["transitions"]
+              }
+            }
+          }
+        },
+        "required": ["customer_id", "agents", "routing"]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["customers"],
+  "additionalProperties": false
+}

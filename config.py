@@ -12,4 +12,4 @@ TTS_MODEL = "aura-asteria-en"
 
 def configure_logging():
     logging.basicConfig(level=LOG_LEVEL)
-    return logging.getLogger("iphone-agent")
+    return logging.getLogger("multiprompt-agent")

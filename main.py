@@ -1,56 +1,25 @@
-# main.py
+import json
+from pathlib import Path
+
 from livekit.agents import AgentSession, JobContext, WorkerOptions, cli
 from livekit.plugins import deepgram, silero, openai
-from config import LLM_MODEL, STT_MODEL, TTS_MODEL
+
+from config_schema import load_and_validate_config
+from agents.factory import build_customer_agents
 from data import UserData
-from agents.greeting import GreetingAgent
-from agents.support import SupportAgent
-from agents.buying import BuyingAgent
+from config import LLM_MODEL, STT_MODEL, TTS_MODEL
 
+async def entrypoint(ctx: JobContext, customer_id: str, cfg_path: str):
+    # Load and validate configuration
+    config = load_and_validate_config(cfg_path)
+    agents, routing = build_customer_agents(config, customer_id)
 
-def get_agent_instructions():
-    """Collect custom instructions for each agent from user input."""
-    print("\n" + "=" * 60)
-    print("🤖 IPHONE SUPPORT AGENT CONFIGURATION")
-    print("=" * 60)
-    print("Customize the instructions for each agent (press Enter to use defaults):\n")
-
-    # Default instructions
-    default_greeting = "You are Jill from iPhone Customer Service. Greet and Welcome customers and ask their name"
-    default_support = "You are an iPhone technical support specialist. Help users with troubleshooting, setup issues, and iPhone questions. Be helpful and thorough."
-    default_buying = "You are an Iphone sales Agent. Ask customer about their needs, focus on camera, battery and phones offering both features. Recommend phones based on their interests. Then finalize the order in a professional way."
-
-    print("1️⃣ GREETING AGENT INSTRUCTIONS:")
-    print(f"   Default: {default_greeting}")
-    # greeting_input = input("   Custom (Press Enter to keep Default): ").strip()
-    # greeting_instructions = greeting_input if greeting_input else default_greeting
-
-    print("\n2️⃣ SUPPORT AGENT INSTRUCTIONS:")
-    print(f"   Default: {default_support}")
-    support_input = input("   Custom (Press Enter to keep Default): ").strip()
-    support_instructions = support_input if support_input else default_support
-
-    print("\n3️⃣ BUYING AGENT INSTRUCTIONS:")
-    print(f"   Default: {default_buying}")
-    buying_input = input("   Custom (Press Enter to keep Default): ").strip()
-    buying_instructions = buying_input if buying_input else default_buying
-
-    print("\n" + "=" * 60)
-    print("🚀 STARTING LIVEKIT AGENT WITH CUSTOM INSTRUCTIONS...")
-    print("=" * 60)
-
-    return default_greeting, support_instructions, buying_instructions
-
-
-async def entrypoint(ctx: JobContext):
-    greeting_ins, support_ins, buying_ins = get_agent_instructions()
+    # Prepare user data
     userdata = UserData()
-    userdata.agents = {
-        "greeting": GreetingAgent(greeting_ins),
-        "support": SupportAgent(support_ins),
-        "buying": BuyingAgent(buying_ins),
-    }
+    userdata.agents = agents
+    userdata.routing = routing
 
+    # Initialize the LiveKit agent session
     session = AgentSession[UserData](
         userdata=userdata,
         llm=openai.LLM(model=LLM_MODEL),
@@ -59,8 +28,39 @@ async def entrypoint(ctx: JobContext):
         vad=silero.VAD.load(),
         max_tool_steps=3,
     )
-    await session.start(agent=userdata.agents["greeting"], room=ctx.room)
+
+    # Start with the greeting agent
+    start_agent = agents.get('greeting')
+    await session.start(agent=start_agent, room=ctx.room)
 
 
 if __name__ == "__main__":
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
+    # Load the config file once to extract customers
+    cfg_path = "config/agents_config.json"
+    try:
+        config = json.loads(Path(cfg_path).read_text())
+        customers = config.get("customers", [])
+        if not customers:
+            raise ValueError("No customers found in config.")
+    except Exception as e:
+        print(f"❌ Failed to load config: {e}")
+        exit(1)
+
+    # Show list of customers
+    print("📋 Available Customers:")
+    for idx, cust in enumerate(customers):
+        print(f"  [{idx+1}] {cust['customer_id']}")
+
+    # Get selection
+    try:
+        choice = int(input("Select a customer by number: ").strip())
+        customer = customers[choice - 1]["customer_id"]
+    except (ValueError, IndexError):
+        print("❌ Invalid selection.")
+        exit(1)
+
+    # Launch agent for selected customer
+    def start_fn(ctx):
+        return entrypoint(ctx, customer, cfg_path)
+
+    cli.run_app(WorkerOptions(entrypoint_fnc=start_fn))
