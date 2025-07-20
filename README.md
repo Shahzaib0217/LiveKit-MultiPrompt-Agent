@@ -5,8 +5,10 @@
 This system implements a multi-prompt voice assistant using **LiveKit Agents SDK**, designed to manage iPhone customer interactions. It employs modular AI agents, each handling specific conversation stages, working collaboratively to streamline **sales** and **technical support** workflows.
 
 
-## Run the below command
-`python iphone-support-agent.py console`
+## To run the agent
+- Setup Python venv & Activate it.
+- Install all required packages, `pip install -r requirements.txt`
+- Finally to talk with the Iphone agent, Run the command `python main.py console`
 
 ## System Architecture
 
@@ -82,14 +84,3 @@ The system flowchart (as shown above) visualizes:
 - Agent transitions.
 - Shared data dependencies.
 - Session end states.
-
-## Deployment Highlights
-
-- **AgentSession Initialization**: Begins with `GreetingAgent`.
-- **Prewarming**: Loads VAD model early via `prewarm()` for optimized responsiveness.
-- **Customizable Agent Prompts**: Supports runtime customization of agent personalities.
-
-## Conclusion
-
-This LiveKit-based multi-agent assistant demonstrates efficient orchestration of voice conversations using AI-driven agents. It leverages best practices in session management, modular agent design, and shared state for delivering a seamless customer experience.
-
