@@ -18,7 +18,7 @@ def get_agent_instructions():
     print("Customize the instructions for each agent (press Enter to use defaults):\n")
 
     # Default instructions
-    default_greeting = "You are Jill from iPhone support. Greet customers and understand if they need support help or want to buy a new iPhone. Route them to the appropriate agent."
+    default_greeting = "You are Jill from iPhone Customer Service. Greet and Welcome customers and ask their name"
     default_support = "You are an iPhone technical support specialist. Help users with troubleshooting, setup issues, and iPhone questions. Be helpful and thorough."
     default_buying = "You are an iPhone sales specialist. Help customers choose the right iPhone model and complete their purchase. Ask about their needs and recommend appropriate models."
 

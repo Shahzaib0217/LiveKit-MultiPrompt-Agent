@@ -1,8 +1,6 @@
 # agents/buying.py
 from livekit.agents import Agent
 from livekit.agents import function_tool
-from livekit.agents.job import get_job_context
-from livekit import api
 
 from agents.base import BaseAgent, RunContext_T
 
@@ -20,6 +18,14 @@ class SupportAgent(BaseAgent):
         userdata = context.userdata
         userdata.support_issue = issue
         return f"I've noted your issue: {issue}. Let me help you resolve this."
+        """
+        Or we coulld do
+            # Prompt for next step
+            await self.session.say(
+                f"Got it — you’re having: “{issue}”. Would you like me to walk through some troubleshooting steps, or connect you with a human agent?"
+            )
+            return self, "awaiting_next_step"
+        """
 
     @function_tool()
     async def complete_support(self, context: RunContext_T) -> str:
@@ -38,12 +44,7 @@ class SupportAgent(BaseAgent):
             "Thank you for contacting iPhone support. Have a great day!"
         )
 
-        # Use the proper LiveKit API to end the session for everyone
-        job_ctx = get_job_context()
-        api_client = api.LiveKitAPI()
-        await api_client.room.delete_room(
-            api.DeleteRoomRequest(room=job_ctx.job.room.name)
-        )
+        await self._end_session()
         return "Support call ended."
 
     @function_tool()

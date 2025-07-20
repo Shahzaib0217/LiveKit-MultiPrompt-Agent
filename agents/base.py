@@ -1,6 +1,8 @@
 # agents/base.py
 from livekit.agents import Agent
 from livekit.agents.voice import RunContext
+from livekit.agents.job import get_job_context
+from livekit import api
 
 from data import UserData
 
@@ -29,7 +31,7 @@ class BaseAgent(Agent):
             chat_ctx.items.extend(items_copy)
 
         await self.update_chat_ctx(chat_ctx)
-        self.session.generate_reply(tool_choice="none")
+        await self.session.generate_reply(tool_choice="none")
 
     async def _transfer_to_agent(
         self, name: str, context: RunContext_T
@@ -41,3 +43,12 @@ class BaseAgent(Agent):
         userdata.prev_agent = current_agent
         print(f"🔀 TRANSFERRING: {current_name} → {name.upper()}AGENT")
         return next_agent, f"Transferring to {name}."
+    
+    async def _end_session(self):
+        job_ctx = get_job_context()
+        await api.LiveKitAPI().room.delete_room(
+            api.DeleteRoomRequest(room=job_ctx.job.room.name)
+        )
+
+    async def on_unrecognized(self, text: str):
+        await self.session.say("Sorry, I didn’t quite get that. Could you rephrase?")

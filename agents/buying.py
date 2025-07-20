@@ -1,8 +1,6 @@
 # agents/buying.py
 from livekit.agents import Agent
 from livekit.agents import function_tool
-from livekit.agents.job import get_job_context
-from livekit import api
 
 from agents.base import BaseAgent, RunContext_T
 
@@ -40,12 +38,7 @@ class BuyingAgent(BaseAgent):
             "Thank you for your purchase! Your new iPhone will be shipped soon. Have a wonderful day!"
         )
 
-        # Use the proper LiveKit API to end the session for everyone
-        job_ctx = get_job_context()
-        api_client = api.LiveKitAPI()
-        await api_client.room.delete_room(
-            api.DeleteRoomRequest(room=job_ctx.job.room.name)
-        )
+        await self._end_session()
         return "Purchase call ended."
 
     @function_tool()
