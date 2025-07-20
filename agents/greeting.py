@@ -7,7 +7,10 @@ from agents.base import BaseAgent, RunContext_T
 class GreetingAgent(BaseAgent):
     def __init__(
         self,
-        instructions: str ="",
+        instructions: str = (
+            "Ask if they need support help or want to buy a new iPhone, "
+            "and route them accordingly."
+        ),
     ):
         super().__init__(instructions=instructions)
 
