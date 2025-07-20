@@ -10,6 +10,23 @@ This system implements a multi-prompt voice assistant using **LiveKit Agents SDK
 - Install all required packages, `pip install -r requirements.txt`
 - Finally to talk with the Iphone agent, Run the command `python main.py console`
 
+## Project Structure
+```
+LIVEKIT-MP-AGENT/
+├── README.md
+├── requirements.txt
+├── .env
+├── config.py
+├── data.py
+├── agents/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── greeting.py
+│   ├── support.py
+│   └── buying.py
+└── main.py
+```
+
 ## System Architecture
 
 ### 1. Core Components
@@ -84,3 +101,5 @@ The system flowchart (as shown above) visualizes:
 - Agent transitions.
 - Shared data dependencies.
 - Session end states.
+
+![alt text](flow-diagram.png)
