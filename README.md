@@ -43,3 +43,8 @@ You can extend this system by:
 
 - Adding more customers in agents_config.json.
 - Adding new function tool definitions and modifying dynamic_agent.py to support dynamic tool addition.
+
+## Thought Process
+- In the Retell Ai's Multi prompt Agent we can create Nodes with unique instructions and do conditional Routing.
+- Here in this appraoch I have tried to achieve the same, We can define multiple agents, each with unique id, each agent is called on specific conditions `"conditions": { "onIntent": "report_issue" }` 
+- One of the major parts of the Multi Prompt Agent is that Different Customers can have different configurations, this approach follows all those principles, *still there is alot of room for improvement :)*. 
