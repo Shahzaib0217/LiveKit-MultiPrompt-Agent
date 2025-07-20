@@ -3,13 +3,21 @@ from livekit.agents import Agent
 from livekit.agents.voice import RunContext
 from livekit.agents.job import get_job_context
 from livekit import api
+from livekit.api.twirp_client import TwirpError
 
 from data import UserData
+from config import configure_logging
 
 RunContext_T = RunContext[UserData]
 
 
 class BaseAgent(Agent):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Create a shared LiveKit API client for this agent
+        self._api_client = api.LiveKitAPI()
+        self.logger = configure_logging()
+
     async def on_enter(self) -> None:
         agent_name = self.__class__.__name__
         print(f"🔄 ENTERING AGENT: {agent_name}")
@@ -43,12 +51,19 @@ class BaseAgent(Agent):
         userdata.prev_agent = current_agent
         print(f"🔀 TRANSFERRING: {current_name} → {name.upper()}AGENT")
         return next_agent, f"Transferring to {name}."
-    
+
     async def _end_session(self):
         job_ctx = get_job_context()
-        await api.LiveKitAPI().room.delete_room(
-            api.DeleteRoomRequest(room=job_ctx.job.room.name)
-        )
+        try:
+            # Try deleting the room for everyone
+            await self._api_client.room.delete_room(
+                api.DeleteRoomRequest(room=job_ctx.job.room.name)
+            )
+        except TwirpError as e:
+            self.logger.warning("Room delete failed (might already be gone): %s", e)
+        finally:
+            # Cleanly close the HTTP client session
+            await self._api_client.aclose()
 
     async def on_unrecognized(self, text: str):
         await self.session.say("Sorry, I didn’t quite get that. Could you rephrase?")

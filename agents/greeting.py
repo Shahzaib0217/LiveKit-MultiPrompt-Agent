@@ -8,7 +8,8 @@ class GreetingAgent(BaseAgent):
     def __init__(
         self,
         instructions: str = (
-            "Ask if they need support help or want to buy a new iPhone, "
+            "First, save customer's name, "
+            "Then ask if they need support help or want to buy a new iPhone, "
             "and route them accordingly."
         ),
     ):

@@ -1,13 +1,11 @@
 # main.py
 from livekit.agents import AgentSession, JobContext, WorkerOptions, cli
 from livekit.plugins import deepgram, silero, openai
-from config import configure_logging, LLM_MODEL, STT_MODEL, TTS_MODEL
+from config import LLM_MODEL, STT_MODEL, TTS_MODEL
 from data import UserData
 from agents.greeting import GreetingAgent
 from agents.support import SupportAgent
 from agents.buying import BuyingAgent
-
-logger = configure_logging()
 
 
 def get_agent_instructions():
@@ -20,12 +18,12 @@ def get_agent_instructions():
     # Default instructions
     default_greeting = "You are Jill from iPhone Customer Service. Greet and Welcome customers and ask their name"
     default_support = "You are an iPhone technical support specialist. Help users with troubleshooting, setup issues, and iPhone questions. Be helpful and thorough."
-    default_buying = "You are an iPhone sales specialist. Help customers choose the right iPhone model and complete their purchase. Ask about their needs and recommend appropriate models."
+    default_buying = "You are an Iphone sales Agent. Ask customer about their needs, focus on camera, battery and phones offering both features. Recommend phones based on their interests. Then finalize the order in a professional way."
 
     print("1️⃣ GREETING AGENT INSTRUCTIONS:")
     print(f"   Default: {default_greeting}")
-    greeting_input = input("   Custom (Press Enter to keep Default): ").strip()
-    greeting_instructions = greeting_input if greeting_input else default_greeting
+    # greeting_input = input("   Custom (Press Enter to keep Default): ").strip()
+    # greeting_instructions = greeting_input if greeting_input else default_greeting
 
     print("\n2️⃣ SUPPORT AGENT INSTRUCTIONS:")
     print(f"   Default: {default_support}")
@@ -41,7 +39,7 @@ def get_agent_instructions():
     print("🚀 STARTING LIVEKIT AGENT WITH CUSTOM INSTRUCTIONS...")
     print("=" * 60)
 
-    return greeting_instructions, support_instructions, buying_instructions
+    return default_greeting, support_instructions, buying_instructions
 
 
 async def entrypoint(ctx: JobContext):
